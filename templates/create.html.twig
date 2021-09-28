@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    Create form
+{% endblock %}
+
+{% block body %}
+        {{ form_start(form) }}
+        
+            {{ form_row(form.title) }}
+
+            {{ form_row(form.author) }}
+
+            {{ form_row(form.description) }}
+                
+            {{ form_row(form.pages) }}
+                
+            {{ form_row(form.publishingHouse) }}
+
+        {{ form_end (form) }}
+{% endblock %}
