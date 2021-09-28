@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Book;
 use App\Form\BookType;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,22 +17,29 @@ class BookController extends AbstractController
      * @Route("/book/new", name="new")
      * Method ({"GET", "POST"})
      */
-    function new (Request $request, EntityManagerInterface $entityManager): Response {
+    function new (Request $request, EntityManagerInterface $entityManager): Response 
+    {
         $book = new Book();
 
         $form = $this->createForm(BookType::class, $book);
-        $form->handleRequest($request);
+        if (!$form->handleRequest($request)) {
+            return new Response('Cannot create new record');
+        }
+        
+        try {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $book = $form->getData();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($book);
+                $entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $book = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($book);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('books');
+                return $this->redirectToRoute('books');
+            }
+            
+        } catch (Exception $e) {
+            return new Response($e->getMessage());
         }
 
-        $errors = $form->getErrors();
         return $this->render('create.html.twig', [
             'form' => $form->createView(),
         ]);
@@ -62,6 +70,9 @@ class BookController extends AbstractController
             ->getRepository(Book::class)
             ->find($id);
 
+        if (empty($book)) {
+            return new Response('Cannot find this record');
+        }
         return $this->render('book.html.twig', [
             'book' => $book,
         ]);
@@ -76,13 +87,22 @@ class BookController extends AbstractController
         $book = $this->getDoctrine()
             ->getRepository(Book::class)
             ->find($id);
-        
-        $entityManager = $this->getDoctrine()
-            ->getManager();
-        $entityManager->remove($book);
-        $entityManager->flush();
 
-        return $this->redirectToRoute('books');
+        if (empty($book)) {
+            return new Response('Cannot delete this record');
+        }
+        
+        try {
+            $entityManager = $this->getDoctrine()
+            ->getManager();
+            $entityManager->remove($book);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('books');
+
+        } catch (Exception $e) {
+            return new Response($e->getMessage());
+        }
     }
 
     /**
@@ -94,17 +114,27 @@ class BookController extends AbstractController
         $book = $this->getDoctrine()
             ->getRepository(Book::class)
             ->find($id);
-        
+
+        if (empty($book)) {
+            return new Response('Cannot update this record');
+        }
+
+        try {
+
             $form = $this->createForm(BookType::class, $book);
             $form->handleRequest($request);
+            
+            if ($form->isSubmitted() && $form->isValid()) {
+                $book = $form->getData();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($book);
+                $entityManager->flush();
+                
+                return $this->redirectToRoute('books');
+            }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $book = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($book);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('books');
+        } catch (Exception $e) {
+            return new Response($e->getMessage());
         }
 
         return $this->render('create.html.twig', [
