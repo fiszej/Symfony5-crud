@@ -15,7 +15,7 @@ class BookController extends AbstractController
 {
     /**
      * @Route("/book/new", name="new")
-     * Method ({"GET", "POST"})
+     * @Method ({"GET", "POST"})
      */
     function new (Request $request, EntityManagerInterface $entityManager): Response 
     {
