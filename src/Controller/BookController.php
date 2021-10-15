@@ -7,6 +7,7 @@ use App\Form\BookType;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,7 +48,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/books", name="books")
-     * Method ({"GET"})
+     * @Method ({"GET"})
      */
     public function index(): Response
     {
@@ -62,7 +63,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/{id}", name="book")
-     * Method ({"GET"})
+     * @Method ({"GET"})
      */
     public function read($id, Request $request)
     {
@@ -80,7 +81,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/delete/{id}", name="delete")
-     * Method ({"GET"})
+     * @Method ({"GET"})
      */
     public function delete($id, Request $request)
     {
@@ -107,7 +108,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/update/{id}", name="update")
-     * Method ({"GET", "POST"})
+     * @Method ({"GET", "POST"})
      */
     public function update($id, Request $request)
     {
